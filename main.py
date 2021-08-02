@@ -27,7 +27,7 @@ lineColor = (0,0,0)
 
 board = [["011" for i in range(rowNum)]for i in range(colNum)]
 
-chanceOfMine = 5 # 1/chance of mine
+chanceOfMine = 1 # 1/chance of mine
 
 #
 # the first number represents whether the box contains a mine or not
@@ -105,7 +105,7 @@ def createBoard():
         for col in range(colNum):
             code = "" # see ln 40 for explanation
             
-            if random.randint(0, chanceOfMine) == 0:
+            if random.randint(1, chanceOfMine) == 1:
                 code += "1"
             else:
                 code += "0"
