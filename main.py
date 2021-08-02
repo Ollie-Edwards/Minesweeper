@@ -12,12 +12,14 @@ WIDTH = 500
 HEIGHT = 500
 gapWidth = 1
 
+pygame.init()
 clock = pygame.time.Clock()
 WIN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
 pygame.display.set_caption("Sorting Visualiser")
+PoppinsFont = pygame.font.Font('Fonts\Poppins-Light.ttf', 14)
 
-rowNum = 40
-colNum = 40
+rowNum = 20
+colNum = 20
 rowWidth = WIDTH // colNum
 colHeight = HEIGHT // rowNum
 
@@ -53,21 +55,46 @@ def updateneighbours(board):
         for col in range(colNum):
             neighbours = 0
 
-            if ( 0 < col+1 < colNum) and ( 0 < row < rowNum):
-                if board[col+1][row][0] == 1:
+            # TODO make this more concise
+
+            row, col = col, row
+
+            if ( 0 <= col+1 < colNum) and ( 0 <= row+1 < rowNum):
+                if board[col+1][row+1][0] == "1":
                     neighbours += 1
 
-            if ( 0 < col+1 < colNum) and ( 0 < row < rowNum):
-                if board[col+1][row][0] == 1:
+            if ( 0 <= col < colNum) and ( 0 <= row+1 < rowNum):
+                if board[col][row+1][0] == "1":
                     neighbours += 1
 
-            if ( 0 < col+1 < colNum) and ( 0 < row < rowNum):
-                if board[col+1][row][0] == 1:
+            if ( 0 <= col-1 < colNum) and ( 0 <= row+1 < rowNum):
+                if board[col-1][row+1][0] == "1":
+                    neighbours += 1   
+
+            if ( 0 <= col-1 < colNum) and ( 0 <= row < rowNum):
+                if board[col-1][row][0] == "1":
+                    neighbours += 1 
+
+            if ( 0 <= col-1 < colNum) and ( 0 <= row-1 < rowNum):
+                if board[col-1][row-1][0] == "1":
+                    neighbours += 1   
+
+            if ( 0 <= col < colNum) and ( 0 <= row-1 < rowNum):
+                if board[col][row-1][0] == "1":
+                    neighbours += 1   
+
+            if ( 0 <= col+1 < colNum) and ( 0 <= row-1 < rowNum):
+                if board[col+1][row-1][0] == "1":
+                    neighbours += 1   
+
+            if ( 0 <= col+1 < colNum) and ( 0 <= row < rowNum):
+
+                if board[col+1][row][0] == "1":
                     neighbours += 1
 
-
-
-                
+            code = list(board[row][col])
+            code[2] = str(neighbours)
+            board[row][col] = str("".join(code))
 
 def createBoard():
     board = [["" for i in range(rowNum)]for i in range(colNum)]
@@ -104,13 +131,22 @@ def drawBoxes(board, rowWidth, colHeight):
 
             if discovered:
                 colour = (0,0,255)   
-
+            
             rect = pygame.Rect(row*rowWidth, col*colHeight, rowWidth, colHeight) #left, top, width, height 
             pygame.draw.rect(WIN, colour, rect)
 
-def visualiseBoard(board):
+            if discovered:
+                # render text
+                textSurfaceObj = PoppinsFont.render(neighbours, True, (255,10,18), None)
+                textRectObj = textSurfaceObj.get_rect()
+                textRectObj.center  = ((row*rowWidth)+rowWidth//2, (col*colHeight)+colHeight//2)
+                WIN.blit(textSurfaceObj, textRectObj)
+
+def RenderBoard(board):
     rowWidth = WIDTH // colNum
     colHeight = HEIGHT // rowNum
+
+    updateneighbours(board)
 
     drawBoxes(board, rowWidth, colHeight)
     drawLines(board, rowWidth, colHeight)
@@ -138,13 +174,12 @@ while run:
 
             WIN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
 
-        if event.type == pygame.MOUSEBUTTONUP: # begining of a drag
+        if event.type == pygame.MOUSEBUTTONDOWN: # begining of a drag
             code = list(board[clickedCol][clickedRow])
             code[1] = "1"
             board[clickedCol][clickedRow] = str("".join(code))
-            print(board[clickedCol][clickedRow])
 
-    visualiseBoard(board)
+    RenderBoard(board)
     
-    #clock.tick(30)
+    clock.tick(30)
     pygame.display.update()
