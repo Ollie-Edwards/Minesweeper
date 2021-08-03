@@ -49,6 +49,11 @@ def drawLines(board, rowWidth, colHeight):
 #             pygame.draw.line(WIN, lineColor, (0, row*rowWidth), (rowWidth, row*rowWidth), gapWidth)
 #             #pygame.draw.line(WIN, lineColor, (col*widthOfBox, 0), (col*widthOfBox, width), gapWidth)
 
+def makeFlagged(col, row):
+    code = list(board[col][row])
+    code[3] = "1"
+    board[col][row] = str("".join(code))
+
 def makeDiscovered(col, row):
     code = list(board[col][row])
     code[1] = "1"
@@ -101,12 +106,13 @@ def createBoard():
             code = "" # see ln 40 for explanation
             
             if random.randint(1, chanceOfMine) == 1:
-                code += "1"
+                code += "1" # ismine
             else:
-                code += "0"
+                code += "0" #ismine
 
-            code += "0"
-            code += "2"
+            code += "0" # is discovered
+            code += "0" # neighbours
+            code += "0" # is flagged
 
             board[col][row] = code
 
@@ -118,7 +124,7 @@ def drawBoxes(board, rowWidth, colHeight):
             colour = (200,200,200)
             node = str(board[col][row])
 
-            mine, discovered, neighbours = (node[0] == "1", node[1] == "1", node[2])
+            mine, discovered, neighbours, flagged = node[0] == "1", node[1] == "1", node[2], node[3] == "1"
 
             if mine == True:
                 colour = (100, 10, 10)      
@@ -135,11 +141,13 @@ def drawBoxes(board, rowWidth, colHeight):
                 textRectObj = textSurfaceObj.get_rect()
                 textRectObj.center  = ((row*rowWidth)+rowWidth//2, (col*colHeight)+colHeight//2)
                 WIN.blit(textSurfaceObj, textRectObj)
+            
+            if flagged:
+                flagImage = pygame.image.load('flag.png')
+                flagImage = pygame.transform.scale(flagImage, (round(rowWidth*.7), round(colHeight*.7)))
+                WIN.blit(flagImage, (row*rowWidth+(round(rowWidth*.15)), col*colHeight+(round(colHeight*.15)))) 
 
 def RenderBoard(board):
-    rowWidth = WIDTH // colNum
-    colHeight = HEIGHT // rowNum
-
     updateNeighbours(board)
 
     drawBoxes(board, rowWidth, colHeight)
@@ -165,6 +173,7 @@ while run:
             
             WIDTH = (WIDTH // colNum)*colNum
             HEIGHT = (HEIGHT // rowNum)*rowNum
+            colHeight, rowWidth = (HEIGHT // rowNum), (WIDTH // colNum)
 
             WIN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
 
@@ -173,6 +182,9 @@ while run:
                 if isMine(clickedCol, clickedRow):
                     exit() ## TODO add end screen
                 makeDiscovered(clickedCol, clickedRow)
+        
+            elif event.button == 3:
+                makeFlagged(clickedCol, clickedRow)
 
     RenderBoard(board)
     
