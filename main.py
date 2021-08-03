@@ -80,17 +80,9 @@ def updateNeighbours(board):
         for col in range(rowNum):
             neighbours = 0
 
-            # TODO make this more concise
-            neighbours += isMine(col+1, row-1)
-            neighbours += isMine(col+1, row)
-            neighbours += isMine(col+1, row+1)
-
-            neighbours += isMine(col-1, row-1)
-            neighbours += isMine(col-1, row)
-            neighbours += isMine(col-1, row+1)
-
-            neighbours += isMine(col, row-1)
-            neighbours += isMine(col, row+1)
+            for i in range(-1, 2, 1):
+                for j in range(-1, 2, 1):
+                    neighbours += isMine(col+j, row+i)
             
             code = list(board[col][row])
             code[2] = str(neighbours)
