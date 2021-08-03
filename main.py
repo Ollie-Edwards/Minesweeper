@@ -27,7 +27,7 @@ lineColor = (0,0,0)
 
 board = [["011" for i in range(rowNum)]for i in range(colNum)]
 
-chanceOfMine = 1 # 1/chance of mine
+chanceOfMine = 5 # 1/chance of mine
 
 #
 # the first number represents whether the box contains a mine or not
@@ -50,51 +50,32 @@ def drawLines(board, rowWidth, colHeight):
 #             pygame.draw.line(WIN, lineColor, (0, row*rowWidth), (rowWidth, row*rowWidth), gapWidth)
 #             #pygame.draw.line(WIN, lineColor, (col*widthOfBox, 0), (col*widthOfBox, width), gapWidth)
 
-def updateneighbours(board):
-    for row in range(rowNum):
-        for col in range(colNum):
+def isMine(col, row):
+    if ( 0 <= col < colNum) and ( 0 <= row < rowNum):
+        if board[col][row][0] == "1":
+            return 1
+    return 0
+
+def updateNeighbours(board):
+    for row in range(colNum):
+        for col in range(rowNum):
             neighbours = 0
 
             # TODO make this more concise
+            neighbours += isMine(col+1, row-1)
+            neighbours += isMine(col+1, row)
+            neighbours += isMine(col+1, row+1)
 
-            row, col = col, row
+            neighbours += isMine(col-1, row-1)
+            neighbours += isMine(col-1, row)
+            neighbours += isMine(col-1, row+1)
 
-            if ( 0 <= col+1 < colNum) and ( 0 <= row+1 < rowNum):
-                if board[col+1][row+1][0] == "1":
-                    neighbours += 1
-
-            if ( 0 <= col < colNum) and ( 0 <= row+1 < rowNum):
-                if board[col][row+1][0] == "1":
-                    neighbours += 1
-
-            if ( 0 <= col-1 < colNum) and ( 0 <= row+1 < rowNum):
-                if board[col-1][row+1][0] == "1":
-                    neighbours += 1   
-
-            if ( 0 <= col-1 < colNum) and ( 0 <= row < rowNum):
-                if board[col-1][row][0] == "1":
-                    neighbours += 1 
-
-            if ( 0 <= col-1 < colNum) and ( 0 <= row-1 < rowNum):
-                if board[col-1][row-1][0] == "1":
-                    neighbours += 1   
-
-            if ( 0 <= col < colNum) and ( 0 <= row-1 < rowNum):
-                if board[col][row-1][0] == "1":
-                    neighbours += 1   
-
-            if ( 0 <= col+1 < colNum) and ( 0 <= row-1 < rowNum):
-                if board[col+1][row-1][0] == "1":
-                    neighbours += 1   
-
-            if ( 0 <= col+1 < colNum) and ( 0 <= row < rowNum):
-
-                if board[col+1][row][0] == "1":
-                    neighbours += 1
-
-            code = list(board[row][col])
+            neighbours += isMine(col, row-1)
+            neighbours += isMine(col, row+1)
+            
+            code = list(board[col][row])
             code[2] = str(neighbours)
-            board[row][col] = str("".join(code))
+            board[col][row] = str("".join(code))
 
 def createBoard():
     board = [["" for i in range(rowNum)]for i in range(colNum)]
@@ -111,7 +92,6 @@ def createBoard():
                 code += "0"
 
             code += "0"
-
             code += "2"
 
             board[col][row] = code
@@ -146,7 +126,7 @@ def RenderBoard(board):
     rowWidth = WIDTH // colNum
     colHeight = HEIGHT // rowNum
 
-    updateneighbours(board)
+    updateNeighbours(board)
 
     drawBoxes(board, rowWidth, colHeight)
     drawLines(board, rowWidth, colHeight)
