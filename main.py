@@ -1,4 +1,3 @@
-from re import split
 import pygame
 import random
 
@@ -49,6 +48,21 @@ def drawLines(board, rowWidth, colHeight):
 #         for row in range(rowNum):
 #             pygame.draw.line(WIN, lineColor, (0, row*rowWidth), (rowWidth, row*rowWidth), gapWidth)
 #             #pygame.draw.line(WIN, lineColor, (col*widthOfBox, 0), (col*widthOfBox, width), gapWidth)
+
+def makeDiscovered(col, row):
+    code = list(board[col][row])
+    code[1] = "1"
+    board[col][row] = str("".join(code))
+
+def isDiscovered(col, row):
+    if list(board[col][row])[1] == "1":
+        return True
+    return False
+
+def getNeighbours(col, row):
+    if ( 0 <= col < colNum) and ( 0 <= row < rowNum):
+        return list(board[col][row])[2]
+    return None
 
 def isMine(col, row):
     if ( 0 <= col < colNum) and ( 0 <= row < rowNum):
@@ -154,10 +168,11 @@ while run:
 
             WIN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
 
-        if event.type == pygame.MOUSEBUTTONDOWN: # begining of a drag
-            code = list(board[clickedCol][clickedRow])
-            code[1] = "1"
-            board[clickedCol][clickedRow] = str("".join(code))
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                if isMine(clickedCol, clickedRow):
+                    exit() ## TODO add end screen
+                makeDiscovered(clickedCol, clickedRow)
 
     RenderBoard(board)
     
